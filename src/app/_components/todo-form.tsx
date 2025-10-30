@@ -15,7 +15,14 @@ export function TodoForm() {
 
       const optimistic = [
         ...(prev ?? []),
-        { id: "optimistic-" + Date.now(), text: newText, done: false },
+        {
+          id: "optimistic-" + Date.now(),
+          text: newText,
+          done: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: "optimistic",
+        },
       ];
       utils.todo.all.setData(undefined, optimistic);
 
