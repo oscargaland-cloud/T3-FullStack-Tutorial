@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    container_name: t3_fullstack_tutorial_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: t3_fullstack_tutorial
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
