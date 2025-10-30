@@ -19,18 +19,7 @@ export const todoRouter = createTRPCRouter({
       "todos from prisma",
       todos.map(({id, text, done}: {id: string; text: string; done: boolean}) => ({id, text, done }))
     );
-    return [
-      {
-        id: "fake",
-        text: "fake text",
-        done: false,
-      },
-      {
-        id: "fake2",
-        text: "fake text 2",
-        done: true,
-      },
-    ];
+    return todos;
   }),
 
   create: protectedProcedure.input(todoInput).mutation(async({ctx, input}) => {
