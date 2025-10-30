@@ -32,14 +32,9 @@ declare module "next-auth" {
 export const authConfig = {
   providers: [
     EmailProvider({
-      server: {
-        host: process.env.EMAIL_SERVER ?? "https://localhost:3000",
-        port: 587,
-        auth: {
-          user: "apikey",
-          pass: process.env.EMAIL_PASSWORD ?? "",
-        },
-      },
+      // Prefer a single SMTP URL from env, e.g.:
+      // EMAIL_SERVER=smtp://USER:PASS@HOST:PORT
+      server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM ?? "default@default.com",
       ...(process.env.NODE_ENV !== "production"
       ? {
