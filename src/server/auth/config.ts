@@ -32,17 +32,23 @@ declare module "next-auth" {
 export const authConfig = {
   providers: [
     EmailProvider({
-      // Prefer a single SMTP URL from env, e.g.:
-      // EMAIL_SERVER=smtp://USER:PASS@HOST:PORT
-      server: process.env.EMAIL_SERVER,
+      // In production use real SMTP from env; in dev provide a harmless placeholder
+      server:
+        process.env.NODE_ENV === "production"
+          ? process.env.EMAIL_SERVER
+          : {
+              host: "localhost",
+              port: 587,
+              auth: { user: "dev", pass: "dev" },
+            },
       from: process.env.EMAIL_FROM ?? "default@default.com",
       ...(process.env.NODE_ENV !== "production"
-      ? {
-        sendVerificationRequest({url}){
-          console.log('LOGIN LINK', url);
-        },
-      }
-      : {}),
+        ? {
+            sendVerificationRequest({ url }) {
+              console.log("LOGIN LINK", url);
+            },
+          }
+        : {}),
 
 
 
