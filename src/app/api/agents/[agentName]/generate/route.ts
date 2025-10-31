@@ -1,7 +1,6 @@
 import { auth } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { agentContext } from "~/server/agents/context";
-import { todoAgent } from "@mastra/agents/todo-agent";
 
 export async function POST(
   request: Request,
@@ -39,6 +38,7 @@ export async function POST(
     // Map agent name to actual agent instance
     let agent;
     if (agentName === "todoAgent" || agentName === "todo") {
+      const { todoAgent } = await import("../../../../../../t3-fullstack/src/mastra/agents/todo-agent");
       agent = todoAgent;
     } else {
       return Response.json(

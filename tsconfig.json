@@ -27,8 +27,7 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"],
-      "@mastra/*": ["./t3-fullstack/src/mastra/*"]
+      "~/*": ["./src/*"]
     }
   },
   "include": [
