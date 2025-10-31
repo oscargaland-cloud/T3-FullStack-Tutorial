@@ -1,5 +1,5 @@
 import { auth } from "~/server/auth";
-import { todoAgent } from "../../../../t3-fullstack/src/mastra/agents/todo-agent";
+import { todoAgent } from "../../../../../t3-fullstack/src/mastra/agents/todo-agent";
 
 export async function POST(request: Request) {
   try {
@@ -13,21 +13,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // Parse request body
-    const body = await request.json();
-    const { message } = body as { message: string };
+    // Parse request body and normalize message
+    const body = (await request.json()) as unknown;
+    const raw = (body as any)?.message;
+    const message =
+      typeof raw === "string"
+        ? raw.trim()
+        : typeof raw?.text === "string"
+          ? raw.text.trim()
+          : "";
 
-    if (!message || typeof message !== "string") {
+    if (!message) {
       return Response.json(
         { success: false, message: "Message is required" },
         { status: 400 }
       );
     }
     
+    // Resolve userId (already authorized above)
+    const userId = session.user.id;
+
     // Run the agent with the user's message and userId in context
+    // Build a well-typed message payload
+    const messages = [{ role: "user" as const, content: message }];
+
     const result = await todoAgent.generate(
-      [{ role: "user" as const, content: message }],
-      { context: { userId: session.user.id } }
+      messages as any,
+      { context: { userId } } as any
     );
 
     // Get the final todos to return
@@ -36,7 +48,7 @@ export async function POST(request: Request) {
         headers: new Headers(),
         prisma: {} as any,
         session: {
-          user: { id: session.user.id },
+          user: { id: userId },
           expires: "",
         },
       })
