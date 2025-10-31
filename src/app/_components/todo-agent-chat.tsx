@@ -37,14 +37,14 @@ export function TodoAgentChat() {
   }
 
   return (
-    <section className="w-full max-w-md rounded-lg border bg-white p-4 shadow">
-      <h2 className="mb-2 text-lg font-semibold">AI Agent</h2>
-      <p className="mb-3 text-sm text-gray-600">
+    <section className="w-full max-w-md rounded-lg border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+      <h2 className="mb-2 text-lg font-semibold text-white">AI Agent</h2>
+      <p className="mb-3 text-sm text-gray-300">
         Try: "add buy milk", "what are my todos?", "mark the first one done".
       </p>
       <form className="mb-3 flex gap-2" onSubmit={onSubmit}>
         <input
-          className="flex-1 rounded border px-3 py-2"
+          className="flex-1 rounded border border-white/20 bg-white/10 px-3 py-2 text-white placeholder:text-gray-400"
           placeholder="Talk to the agent..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -53,13 +53,13 @@ export function TodoAgentChat() {
         <button
           type="submit"
           disabled={isLoading || !message.trim()}
-          className="rounded bg-purple-600 px-4 py-2 font-semibold text-white disabled:opacity-50"
+          className="rounded bg-white/10 px-4 py-2 font-semibold text-white transition hover:bg-white/20 disabled:opacity-50"
         >
           {isLoading ? "…" : "Send"}
         </button>
       </form>
       {response && (
-        <div className="rounded bg-gray-50 p-3 text-sm text-gray-800">{response}</div>
+        <div className="rounded bg-white/10 p-3 text-sm text-white">{response}</div>
       )}
     </section>
   );

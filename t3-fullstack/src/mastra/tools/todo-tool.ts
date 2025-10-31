@@ -9,11 +9,14 @@ async function createTodoCaller(userId: string) {
   // Use dynamic import to avoid circular dependencies
   const { createTRPCContext } = await import("../../../../src/server/api/trpc");
   const { createCaller } = await import("../../../../src/server/api/root");
+  const { prisma } = await import("../../../../src/server/db");
+  
   const context = await createTRPCContext({ headers: new Headers() });
   
   // Override the session to use the provided userId
   const contextWithUserId = {
     ...context,
+    prisma, // Ensure prisma is passed
     session: {
       user: { id: userId },
       expires: "",
@@ -21,6 +24,12 @@ async function createTodoCaller(userId: string) {
   };
   
   return createCaller(contextWithUserId);
+}
+
+// Helper to get userId from context
+async function getUserId(): Promise<string> {
+  const { getAgentUserId } = await import("../../../../src/server/agents/context");
+  return getAgentUserId();
 }
 
 export const listTodosTool = createTool({
@@ -34,9 +43,18 @@ export const listTodosTool = createTool({
       done: z.boolean(),
     })
   ),
-  execute: async ({ context }: { context: { userId: string } }) => {
-    const caller = await createTodoCaller(context.userId);
-    return caller.todo.all();
+  execute: async () => {
+    try {
+      const userId = await getUserId();
+      console.log("listTodos - userId:", userId);
+      const caller = await createTodoCaller(userId);
+      const todos = await caller.todo.all();
+      console.log("listTodos - todos:", todos);
+      return todos;
+    } catch (error) {
+      console.error("listTodos error:", error);
+      throw error;
+    }
   },
 });
 
@@ -51,15 +69,18 @@ export const addTodoTool = createTool({
     text: z.string(),
     done: z.boolean(),
   }),
-  execute: async ({
-    context,
-    input,
-  }: {
-    context: { userId: string };
-    input: { text: string };
-  }) => {
-    const caller = await createTodoCaller(context.userId);
-    return caller.todo.create(input.text);
+  execute: async ({ input }: { input: { text: string } }) => {
+    try {
+      const userId = await getUserId();
+      console.log("addTodo - userId:", userId, "text:", input.text);
+      const caller = await createTodoCaller(userId);
+      const todo = await caller.todo.create(input.text);
+      console.log("addTodo - result:", todo);
+      return todo;
+    } catch (error) {
+      console.error("addTodo error:", error);
+      throw error;
+    }
   },
 });
 
@@ -78,14 +99,9 @@ export const toggleTodoTool = createTool({
     text: z.string(),
     done: z.boolean(),
   }),
-  execute: async ({
-    context,
-    input,
-  }: {
-    context: { userId: string };
-    input: { id: string; done: boolean };
-  }) => {
-    const caller = await createTodoCaller(context.userId);
+  execute: async ({ input }: { input: { id: string; done: boolean } }) => {
+    const userId = await getUserId();
+    const caller = await createTodoCaller(userId);
     return caller.todo.toggle(input);
   },
 });
@@ -98,15 +114,9 @@ export const deleteTodoTool = createTool({
     id: z.string().describe("The id of the todo to delete"),
   }),
   outputSchema: z.object({}),
-  execute: async ({
-    context,
-    input,
-  }: {
-    context: { userId: string };
-    input: { id: string };
-  }) => {
-    const caller = await createTodoCaller(context.userId);
+  execute: async ({ input }: { input: { id: string } }) => {
+    const userId = await getUserId();
+    const caller = await createTodoCaller(userId);
     return caller.todo.delete(input.id);
   },
 });
-

@@ -52,12 +52,12 @@ export function TodoForm() {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Add a todo"
-        className="rounded border px-3 py-2"
+        className="rounded border border-white/20 bg-white/10 px-3 py-2 text-white placeholder:text-gray-400"
       />
       <button
         type="submit"
         disabled={createTodo.isPending}
-        className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+        className="rounded bg-white/10 px-4 py-2 text-white transition hover:bg-white/20 disabled:opacity-50"
       >
         {createTodo.isPending ? "Adding..." : "Add"}
       </button>

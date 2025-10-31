@@ -33,11 +33,11 @@ export function TodoList() {
     onSettled: () => void utils.todo.all.invalidate(),
   });
 
-  if (isLoading) return <p className="text-gray-600">Loading…</p>;
-  if (!todos?.length) return <p className="text-gray-600">No todos yet.</p>;
+  if (isLoading) return <p className="text-gray-300">Loading…</p>;
+  if (!todos?.length) return <p className="text-gray-300">No todos yet.</p>;
 
   return (
-    <ul className="w-full max-w-md divide-y rounded border bg-white">
+    <ul className="w-full max-w-md divide-y divide-white/20 rounded border border-white/20 bg-white/10">
       {todos.map((t) => (
         <li key={t.id} className="flex items-center justify-between gap-3 p-3">
           <label className="flex items-center gap-3">
@@ -45,13 +45,14 @@ export function TodoList() {
               type="checkbox"
               checked={t.done}
               onChange={(e) => toggle.mutate({ id: t.id, done: e.target.checked })}
+              className="h-5 w-5 rounded border-white/20 bg-white/10 text-white"
             />
-            <span className={t.done ? "line-through text-gray-400" : ""}>{t.text}</span>
+            <span className={t.done ? "line-through text-gray-400" : "text-white"}>{t.text}</span>
           </label>
 
           <button
             onClick={() => del.mutate(t.id)}
-            className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+            className="rounded bg-red-500/50 px-3 py-1 text-white transition hover:bg-red-500/70"
           >
             Delete
           </button>
