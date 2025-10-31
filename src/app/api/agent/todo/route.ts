@@ -32,7 +32,8 @@ export async function POST(request: Request) {
 
     const userId = session.user.id;
 
-    // Run agent within async context so tools can access userId
+    // Call the agent within async context so tools can access userId
+    console.log("Agent call with userId:", userId);
     const result = await agentContext.run({ userId }, async () => {
       const response = await todoAgent.stream([
         { role: "user", content: message },
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
         agentResponse += chunk;
       }
 
+      console.log("Agent response:", agentResponse);
       return agentResponse;
     });
 

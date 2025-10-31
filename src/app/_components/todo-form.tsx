@@ -53,6 +53,7 @@ export function TodoForm() {
         onChange={(e) => setText(e.target.value)}
         placeholder="Add a todo"
         className="rounded border border-white/20 bg-white/10 px-3 py-2 text-white placeholder:text-gray-400"
+        style={{ color: 'white' }}
       />
       <button
         type="submit"
