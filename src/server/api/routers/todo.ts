@@ -9,51 +9,54 @@ import { todoInput } from "~/types";
 
 export const todoRouter = createTRPCRouter({
   all: protectedProcedure.query(async({ctx}) => {
-    const todos = await ctx.prisma.todo.findMany({
-      where:{
+    const todos = await ctx.db.todo.findMany({
+      where: {
         userId: ctx.session.user.id,
       },
     });
     console.log(
       "todos from prisma",
-      todos.map(({id, text, done}: {id: string; text: string; done: boolean}) => ({id, text, done }))
+      todos.map(({ id, text, done }) => ({ id, text, done }))
     );
     return todos;
   }),
 
-  create: protectedProcedure.input(todoInput).mutation(async({ctx, input}) => {
-    return ctx.prisma.todo.create({
-      data: {
-        text: input,
-        user: {
-          connect: {
-            id: ctx.session.user.id,
-          },
+  create: protectedProcedure
+    .input(todoInput)
+    .mutation(async({ctx, input}) => {
+      return ctx.db.todo.create({
+        data: {
+          text: input,
+          userId: ctx.session.user.id!,
         },
-      },
-    });
-  }),
-  delete: protectedProcedure.input(z.string()).mutation(async({ctx, input}) => {
-    return ctx.prisma.todo.delete({
-      where: {
-        id: input,
-      },
-    });
-  }),
-  toggle: protectedProcedure.input(z.object({
-    id: z.string(),
-    done: z.boolean(),
-  })
-).mutation(async({ctx, input:{id, done}}) => {
-    return ctx.prisma.todo.update({
-      where: {
-        id,
-      },
-      data: {
-        done,
-      }
-    });
-  }),
+      });
+    }),
+
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async({ctx, input}) => {
+      return ctx.db.todo.delete({
+        where: {
+          id: input,
+        },
+      });
+    }),
+
+  toggle: protectedProcedure
+    .input(z.object({
+      id: z.string(),
+      done: z.boolean(),
+    }))
+    .mutation(async({ctx, input: {id, done}}) => {
+      return ctx.db.todo.update({
+        where: {
+          id,
+        },
+        data: {
+          done,
+        }
+      });
+    }),
 });
 
 

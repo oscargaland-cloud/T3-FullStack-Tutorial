@@ -31,25 +31,28 @@ export function TodoAgentChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text }),
       });
-      const data = await res.json();
-      if (data?.success) {
-        const assistantMessage: ChatMessage = { 
-          role: "assistant", 
-          content: data.message ?? "Done." 
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
-        void utils.todo.all.invalidate();
-      } else {
-        const assistantMessage: ChatMessage = { 
-          role: "assistant", 
-          content: data?.message ?? "Something went wrong" 
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
+
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/json")) {
+        const html = await res.text();
+        throw new Error(`Non-JSON response (${res.status}). ${html.slice(0, 200)}...`);
       }
+
+      const data = await res.json();
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message ?? `Request failed (${res.status})`);
+      }
+
+      const assistantMessage: ChatMessage = {
+        role: "assistant",
+        content: data.message ?? "Done.",
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      void utils.todo.all.invalidate();
     } catch (err) {
-      const assistantMessage: ChatMessage = { 
-        role: "assistant", 
-        content: err instanceof Error ? err.message : "Network error" 
+      const assistantMessage: ChatMessage = {
+        role: "assistant",
+        content: err instanceof Error ? err.message : "Network error",
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } finally {

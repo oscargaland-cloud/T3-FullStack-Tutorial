@@ -31,6 +31,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
 
   return {
     prisma,
+    db: prisma, // Alias for compatibility
     session,
     ...opts,
   };
