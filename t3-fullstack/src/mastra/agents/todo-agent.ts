@@ -1,6 +1,8 @@
 // src/mastra/agents/todo-agent.ts
 
 import { Agent } from "@mastra/core";
+import { Memory } from "@mastra/memory";
+import { LibSQLStore } from "@mastra/libsql";
 import {
   addTodoTool,
   deleteTodoTool,
@@ -52,6 +54,13 @@ Always respond in a natural, conversational way. Never just say "Done." - always
     toggleTodoTool,
     deleteTodoTool,
   },
+  memory: new Memory({
+    storage: new LibSQLStore({
+      // Store conversation memory for the todo agent
+      // Using file storage so memory persists across restarts
+      url: 'file:../todo-agent-memory.db',
+    }),
+  }),
 });
 
 
