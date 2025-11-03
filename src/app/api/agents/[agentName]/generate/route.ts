@@ -1,10 +1,12 @@
+// src/app/api/agent/todo/route.ts
+
 import { auth } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { agentContext } from "~/server/agents/context";
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ agentName: string }> }
+  { params }: { params: Promise<{ agentName: string }> },
 ) {
   try {
     const { agentName } = await params;
@@ -38,7 +40,9 @@ export async function POST(
     // Map agent name to actual agent instance
     let agent;
     if (agentName === "todoAgent" || agentName === "todo") {
-      const { todoAgent } = await import("../../../../../../t3-fullstack/src/mastra/agents/todo-agent");
+      const { todoAgent } = await import(
+        "../../../../../../t3-fullstack/src/mastra/agents/todo-agent"
+      );
       agent = todoAgent;
     } else {
       return Response.json(
@@ -49,9 +53,7 @@ export async function POST(
 
     // Call the agent within async context so tools can access userId
     const result = await agentContext.run({ userId }, async () => {
-      const response = await agent.stream([
-        { role: "user", content: message },
-      ]);
+      const response = await agent.stream([{ role: "user", content: message }]);
 
       let agentResponse = "";
       for await (const chunk of response.textStream) {
@@ -99,4 +101,6 @@ export async function POST(
     );
   }
 }
+
+
 

@@ -1,13 +1,19 @@
-import { AsyncLocalStorage } from "async_hooks";
+// src/server/agents/context.ts
 
-export const agentContext = new AsyncLocalStorage<{ userId: string }>();
+import { AsyncLocalStorage } from "node:async_hooks";
 
-// Helper to get current userId from context
+interface AgentContextType {
+  userId?: string;
+}
+
+export const agentContext = new AsyncLocalStorage<AgentContextType>();
+
+// Get current userId inside tools or Mastra calls
 export function getAgentUserId(): string {
-  const ctx = agentContext.getStore();
-  if (!ctx?.userId) {
-    throw new Error("No userId in agent context - agent must be called with context");
+  const store = agentContext.getStore();
+  if (!store?.userId) {
+    throw new Error("No userId found in agent context");
   }
-  return ctx.userId;
+  return store.userId;
 }
 

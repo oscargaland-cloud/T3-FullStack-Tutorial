@@ -1,4 +1,4 @@
-// src/mastra/tools/todos.ts  (adjust path if yours is different)
+// src/mastra/tools/todos.ts
 
 import { createCaller } from "~/server/api/root";
 import { prisma } from "~/server/db";
@@ -38,10 +38,12 @@ export async function deleteTodo(userId: string, id: string) {
   return caller.todo.delete(id);
 }
 
-// run the Mastra agent WITH user runtime context
+// run the Mastra agent WITH user runtime context (via agentContext ALS)
 export async function runTodoAgentForUser(userId: string, message: string) {
   // Dynamic import to avoid circular dependencies
-  const { todoAgent } = await import("../../../t3-fullstack/src/mastra/agents/todo-agent");
+  const { todoAgent } = await import(
+    "../../../t3-fullstack/src/mastra/agents/todo-agent"
+  );
 
   // Wrap agent execution in AsyncLocalStorage context so tools can access userId
   const result = await agentContext.run({ userId }, async () => {
@@ -57,6 +59,7 @@ export async function runTodoAgentForUser(userId: string, message: string) {
     todos,
   };
 }
+
 
 
 

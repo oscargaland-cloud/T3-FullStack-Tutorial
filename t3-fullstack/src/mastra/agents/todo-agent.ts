@@ -1,8 +1,6 @@
 // src/mastra/agents/todo-agent.ts
 
 import { Agent } from "@mastra/core";
-import { Memory } from "@mastra/memory";
-import { LibSQLStore } from "@mastra/libsql";
 import {
   addTodoTool,
   deleteTodoTool,
@@ -12,7 +10,8 @@ import {
 
 export const todoAgent = new Agent({
   name: "todo-agent",
-  instructions: `You are a helpful assistant that manages TODO items for the logged-in user.
+  instructions: `
+You are a helpful assistant that manages TODO items for the logged-in user.
 
 The backend will ALWAYS provide { userId } in the runtime context, so do NOT ask the user to log in or for their user ID.
 
@@ -40,13 +39,14 @@ Workflow examples:
 - "delete the second todo" → STEP 1: call listTodos tool, STEP 2: get the second item's id, STEP 3: call deleteTodo tool with that id
 
 Response format examples:
-- After adding a todo: "✅ Your todo \"buy milk\" has been created successfully!"
-- After toggling a todo to done: "✅ \"buy milk\" has been marked as done!"
-- After toggling a todo to not done: "✅ \"buy milk\" has been marked as not done!"
-- After deleting a todo: "✅ Your todo \"buy milk\" has been deleted successfully!"
+- After adding a todo: "✅ Your todo \\"buy milk\\" has been created successfully!"
+- After toggling a todo to done: "✅ \\"buy milk\\" has been marked as done!"
+- After toggling a todo to not done: "✅ \\"buy milk\\" has been marked as not done!"
+- After deleting a todo: "✅ Your todo \\"buy milk\\" has been deleted successfully!"
 - When listing todos: "Here are your todos: ..." or "You have no todos yet."
 
-Always respond in a natural, conversational way. Never just say "Done." - always provide a specific confirmation message.`,
+Always respond in a natural, conversational way. Never just say "Done." - always provide a specific confirmation message.
+`,
   model: "openai/gpt-4o-mini",
   tools: {
     listTodosTool,
@@ -54,13 +54,6 @@ Always respond in a natural, conversational way. Never just say "Done." - always
     toggleTodoTool,
     deleteTodoTool,
   },
-  memory: new Memory({
-    storage: new LibSQLStore({
-      // Store conversation memory for the todo agent
-      // Using file storage so memory persists across restarts
-      url: 'file:../todo-agent-memory.db',
-    }),
-  }),
 });
 
 
