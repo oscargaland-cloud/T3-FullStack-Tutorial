@@ -1,3 +1,5 @@
+// src/mastra/tools/todo-tool.ts
+
 import { createTool } from "@mastra/core";
 import { z } from "zod";
 
@@ -9,7 +11,7 @@ async function createTodoCaller(userId: string) {
   // Use dynamic import to avoid circular dependencies
   const { createCaller } = await import("../../../../src/server/api/root");
   const { prisma } = await import("../../../../src/server/db");
-  
+
   // createCaller expects an async function that returns context
   const caller = createCaller(async () => ({
     session: {
@@ -20,13 +22,15 @@ async function createTodoCaller(userId: string) {
     db: prisma, // Add db alias
     headers: new Headers(),
   }));
-  
+
   return caller;
 }
 
-// Helper to get userId from context
+// Helper to get userId from context (AsyncLocalStorage)
 async function getUserId(): Promise<string> {
-  const { getAgentUserId } = await import("../../../../src/server/agents/context");
+  const { getAgentUserId } = await import(
+    "../../../../src/server/agents/context"
+  );
   return getAgentUserId();
 }
 
@@ -39,7 +43,7 @@ export const listTodosTool = createTool({
       id: z.string(),
       text: z.string(),
       done: z.boolean(),
-    })
+    }),
   ),
   execute: async () => {
     try {
@@ -60,7 +64,9 @@ export const addTodoTool = createTool({
   id: "add-todo",
   description: "Create a new todo item",
   inputSchema: z.object({
-    text: z.string().describe("The text content of the todo item (e.g. 'buy milk')"),
+    text: z
+      .string()
+      .describe("The text content of the todo item (e.g. 'buy milk')"),
   }),
   outputSchema: z.object({
     id: z.string(),
@@ -118,3 +124,5 @@ export const deleteTodoTool = createTool({
     return caller.todo.delete(context.id);
   },
 });
+
+
